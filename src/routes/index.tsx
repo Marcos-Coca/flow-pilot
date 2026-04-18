@@ -164,52 +164,6 @@ function WorkflowEditor() {
             <p className="mt-0.5 text-[11px] text-muted-foreground">Draft</p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-xl border border-border bg-background p-1">
-            <button
-              onClick={() => {
-                setCanvasMode("editor");
-              }}
-              className={
-                isEditorMode
-                  ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
-                  : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              }
-            >
-              Editor
-            </button>
-            <button
-              onClick={() => {
-                setCanvasMode("playground");
-                setLibraryOpen(false);
-                setSelectedNode(null);
-                setNodeSearch("");
-              }}
-              className={
-                isPlaygroundMode
-                  ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
-                  : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              }
-            >
-              Playground
-            </button>
-          </div>
-
-          {isEditorMode ? (
-            <Button
-              onClick={() => {
-                setSelectedNode(null);
-                setLibraryOpen(true);
-              }}
-              size="sm"
-              variant="outline"
-            >
-              <Plus className="size-3.5" />
-              Add Node
-            </Button>
-          ) : null}
-        </div>
       </header>
 
       {/* Main content */}
@@ -263,15 +217,67 @@ function WorkflowEditor() {
             />
           </ReactFlow>
 
-          {isPlaygroundMode ? (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <div className="rounded-2xl border border-border bg-card/95 p-2 shadow-2xl shadow-foreground/10 backdrop-blur-sm">
-                <Button className="pointer-events-auto" size="lg">
-                  Execute Workflow
-                </Button>
+          <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex justify-center px-4">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-2xl border border-border bg-card/95 p-2 shadow-2xl shadow-foreground/10 backdrop-blur-sm">
+              <div className="flex items-center rounded-xl border border-border bg-background p-1">
+                <button
+                  onClick={() => {
+                    setCanvasMode("editor");
+                  }}
+                  className={
+                    isEditorMode
+                      ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+                      : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  }
+                >
+                  Editor
+                </button>
+                <button
+                  onClick={() => {
+                    setCanvasMode("playground");
+                    setLibraryOpen(false);
+                    setSelectedNode(null);
+                    setNodeSearch("");
+                  }}
+                  className={
+                    isPlaygroundMode
+                      ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+                      : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  }
+                >
+                  Playground
+                </button>
               </div>
+
+              {isEditorMode ? (
+                <>
+                  <div className="h-8 w-px bg-border" />
+                  <Button
+                    onClick={() => {
+                      setSelectedNode(null);
+                      setLibraryOpen(true);
+                    }}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Plus className="size-3.5" />
+                    Add Node
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setCanvasMode("playground");
+                      setLibraryOpen(false);
+                      setSelectedNode(null);
+                      setNodeSearch("");
+                    }}
+                    size="sm"
+                  >
+                    Execute Workflow
+                  </Button>
+                </>
+              ) : null}
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
 
