@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense, useState } from 'react'
 
+import { Button } from '~/components/ui/button'
+
 const deferredQueryOptions = () =>
   queryOptions({
     queryKey: ['deferred'],
@@ -33,7 +35,9 @@ function Deferred() {
       </Suspense>
       <div>Count: {count}</div>
       <div>
-        <button onClick={() => setCount(count + 1)}>Increment</button>
+        <Button onClick={() => setCount((value) => value + 1)} size="sm">
+          Increment
+        </Button>
       </div>
     </div>
   )

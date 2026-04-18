@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DAs1UGHr.js";var t=e();function n(){return(0,t.jsx)(`div`,{className:`p-2`,children:(0,t.jsx)(`h3`,{children:`Welcome Home!!!`})})}export{n as component};
