@@ -1,2 +1,3 @@
-- prefer always using values from the tailwind theme instead of harcoding values.
+- Prefer always using values from the tailwind theme instead of harcoding values.
 - React Compiler is enabled: prefer simple/pure component structure and avoid manual `useMemo`, `useCallback`, and `React.memo` unless profiling proves they are needed.
+- Prefer using shadcn components if possible instead of creating components from scratch.

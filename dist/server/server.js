@@ -3860,7 +3860,7 @@ var defaultSerovalPlugins = [
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-Bw8AO4rR.js");
+	const { tsrStartManifest } = await import("./assets/_tanstack-start-manifest_v-zsf9M84G.js");
 	const startManifest = tsrStartManifest();
 	const rootRoute = startManifest.routes[rootRouteId$1] = startManifest.routes["__root__"] || {};
 	rootRoute.assets = rootRoute.assets || [];
@@ -4880,7 +4880,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./assets/router-CAyDvul_.js"),
+		import("./assets/router-BbQedE7J.js"),
 		import("./assets/start-C9t9Nps7.js"),
 		import("./assets/__23tanstack-start-plugin-adapters-y_fshQDY.js")
 	]);

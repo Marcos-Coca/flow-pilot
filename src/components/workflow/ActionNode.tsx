@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 
 type ActionNodeType = Node<WorkflowNodeData, "action">;
 
-export function ActionNode({ selected }: NodeProps<ActionNodeType>) {
+export function ActionNode({ data, selected }: NodeProps<ActionNodeType>) {
   return (
     <div
       className={`
@@ -25,10 +25,10 @@ export function ActionNode({ selected }: NodeProps<ActionNodeType>) {
         </div>
         <div className="min-w-0 pt-0.5">
           <div className="text-[13px] font-semibold leading-tight text-foreground">
-            HTTP Request
+            {data.label}
           </div>
           <div className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-            Make an API call
+            {data.subtitle}
           </div>
         </div>
       </div>

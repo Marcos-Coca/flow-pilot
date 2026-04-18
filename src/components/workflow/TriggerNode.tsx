@@ -4,7 +4,7 @@ import { Zap } from "lucide-react";
 
 type TriggerNodeType = Node<WorkflowNodeData, "trigger">;
 
-export function TriggerNode({ selected }: NodeProps<TriggerNodeType>) {
+export function TriggerNode({ data, selected }: NodeProps<TriggerNodeType>) {
   return (
     <div
       className={`
@@ -26,10 +26,10 @@ export function TriggerNode({ selected }: NodeProps<TriggerNodeType>) {
         </div>
         <div className="min-w-0 pt-0.5">
           <div className="text-[13px] font-semibold leading-tight text-foreground">
-            Manual Trigger
+            {data.label}
           </div>
           <div className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-            Starts workflow manually
+            {data.subtitle}
           </div>
         </div>
       </div>

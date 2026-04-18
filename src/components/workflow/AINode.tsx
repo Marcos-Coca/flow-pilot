@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 
 type AINodeType = Node<WorkflowNodeData, "ai">;
 
-export function AINode({ selected }: NodeProps<AINodeType>) {
+export function AINode({ data, selected }: NodeProps<AINodeType>) {
   return (
     <div
       className={`
@@ -25,10 +25,10 @@ export function AINode({ selected }: NodeProps<AINodeType>) {
         </div>
         <div className="min-w-0 pt-0.5">
           <div className="text-[13px] font-semibold leading-tight text-foreground">
-            AI Extract
+            {data.label}
           </div>
           <div className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-            Extract data with AI
+            {data.subtitle}
           </div>
         </div>
       </div>

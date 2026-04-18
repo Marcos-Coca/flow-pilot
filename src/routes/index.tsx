@@ -11,20 +11,19 @@ import {
   type Connection,
   BackgroundVariant,
 } from "@xyflow/react";
-import {
-  Plus,
-  Zap,
-  Globe,
-  Sparkles,
-  ChevronDown,
-  Workflow,
-} from "lucide-react";
+import { Plus, Workflow } from "lucide-react";
 import {
   nodeTypes,
   type WorkflowNode,
-  type WorkflowNodeData,
 } from "~/components/workflow/types";
 import { InspectorPanel } from "~/components/workflow/InspectorPanel";
+import {
+  NodeLibraryPanel,
+  type NodeTemplate,
+} from "~/components/workflow/NodeLibraryPanel";
+import { Button } from "~/components/ui/button";
+
+type CanvasMode = "editor" | "playground";
 
 export const Route = createFileRoute("/")({
   component: WorkflowEditor,
@@ -80,58 +79,55 @@ const initialEdges = [
   },
 ];
 
-const nodeTemplates: {
-  type: WorkflowNodeData["type"];
-  label: string;
-  subtitle: string;
-  icon: typeof Zap;
-}[] = [
+const nodeTemplates: NodeTemplate[] = [
   {
     type: "trigger",
-    label: "Manual Trigger",
-    subtitle: "Starts workflow manually",
-    icon: Zap,
+    label: "When click executes the workflow",
+    subtitle: "Run the workflow when someone clicks to start it",
+    section: "Triggers",
   },
   {
     type: "action",
     label: "HTTP Request",
     subtitle: "Make an API call",
-    icon: Globe,
+    section: "Actions",
   },
   {
     type: "ai",
     label: "AI Extract",
     subtitle: "Extract data with AI",
-    icon: Sparkles,
+    section: "Actions",
   },
 ];
-
-const colorClasses = {
-  trigger: "text-node-trigger bg-node-trigger/15",
-  action: "text-node-action bg-node-action/15",
-  ai: "text-node-ai bg-node-ai/15",
-} as const;
 
 function WorkflowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [nodeSearch, setNodeSearch] = useState("");
+  const [canvasMode, setCanvasMode] = useState<CanvasMode>("editor");
   const counterRef = useRef(4);
+  const isEditorMode = canvasMode === "editor";
+  const isPlaygroundMode = canvasMode === "playground";
 
   const onConnect = (connection: Connection) => {
+    if (!isEditorMode) return;
     setEdges((eds) => addEdge(connection, eds));
   };
 
   const onNodeClick = (_: React.MouseEvent, node: WorkflowNode) => {
+    if (!isEditorMode) return;
+    setLibraryOpen(false);
     setSelectedNode(node);
   };
 
   const onPaneClick = () => {
+    if (!isEditorMode) return;
     setSelectedNode(null);
   };
 
-  const addNode = (template: (typeof nodeTemplates)[number]) => {
+  const addNode = (template: NodeTemplate) => {
     const id = `${template.type}-${counterRef.current++}`;
     const newNode: WorkflowNode = {
       id,
@@ -148,7 +144,9 @@ function WorkflowEditor() {
       },
     };
     setNodes((nds) => [...nds, newNode]);
-    setMenuOpen(false);
+    setSelectedNode(newNode);
+    setLibraryOpen(false);
+    setNodeSearch("");
   };
 
   return (
@@ -168,66 +166,67 @@ function WorkflowEditor() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Add Node dropdown */}
-          <div className="relative">
+          <div className="flex items-center rounded-xl border border-border bg-background p-1">
             <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-muted"
+              onClick={() => {
+                setCanvasMode("editor");
+              }}
+              className={
+                isEditorMode
+                  ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+                  : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              }
+            >
+              Editor
+            </button>
+            <button
+              onClick={() => {
+                setCanvasMode("playground");
+                setLibraryOpen(false);
+                setSelectedNode(null);
+                setNodeSearch("");
+              }}
+              className={
+                isPlaygroundMode
+                  ? "rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+                  : "rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              }
+            >
+              Playground
+            </button>
+          </div>
+
+          {isEditorMode ? (
+            <Button
+              onClick={() => {
+                setSelectedNode(null);
+                setLibraryOpen(true);
+              }}
+              size="sm"
+              variant="outline"
             >
               <Plus className="size-3.5" />
               Add Node
-              <ChevronDown className="size-3 text-muted-foreground" />
-            </button>
-
-            {menuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setMenuOpen(false)}
-                />
-                <div className="absolute right-0 z-50 mt-1.5 w-52 overflow-hidden rounded-xl border border-border bg-card p-1 shadow-xl shadow-foreground/10">
-                  {nodeTemplates.map((t) => {
-                    const Icon = t.icon;
-                    return (
-                      <button
-                        key={t.type}
-                        onClick={() => addNode(t)}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-muted"
-                      >
-                        <div
-                          className={`flex size-7 items-center justify-center rounded-md ${colorClasses[t.type]}`}
-                        >
-                          <Icon className="size-3.5" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-medium">{t.label}</div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {t.subtitle}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
+            </Button>
+          ) : null}
         </div>
       </header>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Canvas */}
-        <div className="workflow-canvas flex-1">
+        <div className="workflow-canvas relative flex-1">
           <ReactFlow<WorkflowNode>
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
+            onNodeClick={isEditorMode ? onNodeClick : undefined}
+            onPaneClick={isEditorMode ? onPaneClick : undefined}
             nodeTypes={nodeTypes}
+            nodesDraggable={isEditorMode}
+            nodesConnectable={isEditorMode}
+            elementsSelectable={isEditorMode}
             fitView
             fitViewOptions={{ padding: 0.3 }}
             defaultEdgeOptions={{
@@ -263,14 +262,36 @@ function WorkflowEditor() {
               className="!rounded-xl !border-border !bg-card/80 !shadow-lg !shadow-foreground/10"
             />
           </ReactFlow>
-        </div>
 
-        {/* Inspector */}
-        <InspectorPanel
-          node={selectedNode}
-          onClose={() => setSelectedNode(null)}
-        />
+          {isPlaygroundMode ? (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <div className="rounded-2xl border border-border bg-card/95 p-2 shadow-2xl shadow-foreground/10 backdrop-blur-sm">
+                <Button className="pointer-events-auto" size="lg">
+                  Execute Workflow
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
+
+      {isEditorMode && libraryOpen ? (
+        <NodeLibraryPanel
+          open={libraryOpen}
+          templates={nodeTemplates}
+          searchValue={nodeSearch}
+          onSearchChange={setNodeSearch}
+          onAddNode={addNode}
+          onClose={() => {
+            setLibraryOpen(false);
+            setNodeSearch("");
+          }}
+        />
+      ) : null}
+
+      {isEditorMode && !libraryOpen && selectedNode ? (
+        <InspectorPanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+      ) : null}
     </div>
   );
 }
