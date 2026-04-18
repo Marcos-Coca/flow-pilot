@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-DAs1UGHr.js";import{n as t}from"./Match-7UNdqdBz.js";var n=e();function r(){return(0,n.jsxs)(`div`,{className:`p-2`,children:[(0,n.jsx)(`div`,{children:`I'm a pathless layout`}),(0,n.jsx)(`div`,{children:(0,n.jsx)(t,{})})]})}export{r as component};

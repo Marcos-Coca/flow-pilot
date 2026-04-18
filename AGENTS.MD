@@ -1,0 +1,2 @@
+- prefer always using values from the tailwind theme instead of harcoding values.
+- React Compiler is enabled: prefer simple/pure component structure and avoid manual `useMemo`, `useCallback`, and `React.memo` unless profiling proves they are needed.
