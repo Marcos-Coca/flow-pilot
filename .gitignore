@@ -5,8 +5,11 @@ yarn.lock
 .DS_Store
 .cache
 .env
+.dev.vars
+.dev.vars.*
 .vercel
 .output
+.wrangler
 /build/
 /api/
 /server/build

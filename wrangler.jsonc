@@ -1,0 +1,21 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "flow-pilot",
+	"compatibility_date": "2026-04-23",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"main": "@tanstack/react-start/server-entry",
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "flow-pilot-db",
+			"database_id": "a096a259-8521-4dd1-ab06-94bee0f4f32c",
+			"preview_database_id": "a096a259-8521-4dd1-ab06-94bee0f4f32c",
+			"migrations_dir": "drizzle"
+		}
+	]
+}

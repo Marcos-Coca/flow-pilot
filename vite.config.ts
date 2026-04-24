@@ -1,4 +1,5 @@
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { cloudflare } from '@cloudflare/vite-plugin'
 import { defineConfig } from 'vite'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
@@ -13,6 +14,7 @@ export default defineConfig({
   },
   plugins: [
     tailwindcss(),
+    cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tanstackStart(),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
