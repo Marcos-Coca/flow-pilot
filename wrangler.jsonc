@@ -5,10 +5,17 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
-	"main": "@tanstack/react-start/server-entry",
+	"main": "src/server.ts",
 	"observability": {
 		"enabled": true
 	},
+	"workflows": [
+		{
+			"binding": "WORKFLOW_EXECUTOR",
+			"name": "flow-pilot-executor",
+			"class_name": "WorkflowExecutor"
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",

@@ -1,0 +1,112 @@
+import { and, eq } from 'drizzle-orm'
+import { env } from 'cloudflare:workers'
+import { createFileRoute } from '@tanstack/react-router'
+import { getDb } from '~/db/client'
+import { type JsonValue, workflowRuns, workflows } from '~/db/schema'
+import { buildLinearExecutionPlan } from '~/workflows/execution-plan'
+import { createPendingSteps } from '~/workflows/run-state'
+import type {
+  WorkflowBindings,
+  WorkflowExecutionPayload,
+} from '~/workflows/types'
+
+interface StartWorkflowRunRequest {
+  workflowVersionId: string
+  triggerNodeId: string
+  input?: JsonValue
+}
+
+export const Route = createFileRoute('/api/workflow-runs')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const db = getDb()
+        const workflowExecutor = (env as Env & WorkflowBindings).WORKFLOW_EXECUTOR
+        const body = (await request.json()) as StartWorkflowRunRequest
+
+        if (!body.workflowVersionId || !body.triggerNodeId) {
+          return Response.json(
+            {
+              error:
+                'workflowVersionId and triggerNodeId are required to start a workflow run',
+            },
+            { status: 400 },
+          )
+        }
+
+        const workflowVersion = await db.query.workflowVersions.findFirst({
+          where: (table, { eq }) => eq(table.id, body.workflowVersionId),
+        })
+
+        if (!workflowVersion) {
+          return Response.json(
+            { error: `Workflow version "${body.workflowVersionId}" was not found` },
+            { status: 404 },
+          )
+        }
+
+        const workflow = await db.query.workflows.findFirst({
+          where: and(eq(workflows.id, workflowVersion.workflowId)),
+        })
+
+        if (!workflow) {
+          return Response.json(
+            { error: `Workflow "${workflowVersion.workflowId}" was not found` },
+            { status: 404 },
+          )
+        }
+
+        const executionPlan = buildLinearExecutionPlan(
+          workflowVersion.definition,
+          body.triggerNodeId,
+        )
+
+        const runId = crypto.randomUUID()
+
+        await db.insert(workflowRuns).values({
+          id: runId,
+          userId: workflow.userId,
+          workflowId: workflow.id,
+          workflowVersionId: workflowVersion.id,
+          triggerNodeId: body.triggerNodeId,
+          status: 'queued',
+          input: body.input ?? null,
+          createdAt: Date.now(),
+        })
+
+        await createPendingSteps(db, runId, executionPlan)
+
+        const payload: WorkflowExecutionPayload = {
+          runId,
+          userId: workflow.userId,
+          workflowId: workflow.id,
+          workflowVersionId: workflowVersion.id,
+          triggerNodeId: body.triggerNodeId,
+          definition: workflowVersion.definition,
+          input: body.input ?? null,
+        }
+
+        const instance = await workflowExecutor.create({
+          id: runId,
+          params: payload,
+        })
+
+        await db
+          .update(workflowRuns)
+          .set({
+            cloudflareWorkflowInstanceId: instance.id,
+          })
+          .where(eq(workflowRuns.id, runId))
+
+        return Response.json({
+          runId,
+          workflowId: workflow.id,
+          workflowVersionId: workflowVersion.id,
+          instanceId: instance.id,
+          status: await instance.status(),
+          stepCount: executionPlan.length,
+        })
+      },
+    },
+  },
+})

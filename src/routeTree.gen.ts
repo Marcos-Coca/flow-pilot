@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DeferredRouteImport } from './routes/deferred'
 import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiWorkflowRunsRouteImport } from './routes/api/workflow-runs'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
+import { Route as ApiWorkflowRunsIdRouteImport } from './routes/api/workflow-runs.$id'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
+import { Route as ApiDbHealthRouteImport } from './routes/api/db/health'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
 
@@ -32,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWorkflowRunsRoute = ApiWorkflowRunsRouteImport.update({
+  id: '/api/workflow-runs',
+  path: '/api/workflow-runs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUsersRoute = ApiUsersRouteImport.update({
   id: '/api/users',
   path: '/api/users',
@@ -42,10 +50,20 @@ const PathlessLayoutNestedLayoutRoute =
     id: '/_nested-layout',
     getParentRoute: () => PathlessLayoutRoute,
   } as any)
+const ApiWorkflowRunsIdRoute = ApiWorkflowRunsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiWorkflowRunsRoute,
+} as any)
 const ApiUsersIdRoute = ApiUsersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiUsersRoute,
+} as any)
+const ApiDbHealthRoute = ApiDbHealthRouteImport.update({
+  id: '/api/db/health',
+  path: '/api/db/health',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PathlessLayoutNestedLayoutRouteBRoute =
   PathlessLayoutNestedLayoutRouteBRouteImport.update({
@@ -64,17 +82,23 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deferred': typeof DeferredRoute
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/db/health': typeof ApiDbHealthRoute
   '/api/users/$id': typeof ApiUsersIdRoute
+  '/api/workflow-runs/$id': typeof ApiWorkflowRunsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deferred': typeof DeferredRoute
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/db/health': typeof ApiDbHealthRoute
   '/api/users/$id': typeof ApiUsersIdRoute
+  '/api/workflow-runs/$id': typeof ApiWorkflowRunsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,9 +107,12 @@ export interface FileRoutesById {
   '/deferred': typeof DeferredRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
+  '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
+  '/api/db/health': typeof ApiDbHealthRoute
   '/api/users/$id': typeof ApiUsersIdRoute
+  '/api/workflow-runs/$id': typeof ApiWorkflowRunsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -93,17 +120,23 @@ export interface FileRouteTypes {
     | '/'
     | '/deferred'
     | '/api/users'
+    | '/api/workflow-runs'
     | '/route-a'
     | '/route-b'
+    | '/api/db/health'
     | '/api/users/$id'
+    | '/api/workflow-runs/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/deferred'
     | '/api/users'
+    | '/api/workflow-runs'
     | '/route-a'
     | '/route-b'
+    | '/api/db/health'
     | '/api/users/$id'
+    | '/api/workflow-runs/$id'
   id:
     | '__root__'
     | '/'
@@ -111,9 +144,12 @@ export interface FileRouteTypes {
     | '/deferred'
     | '/_pathlessLayout/_nested-layout'
     | '/api/users'
+    | '/api/workflow-runs'
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
+    | '/api/db/health'
     | '/api/users/$id'
+    | '/api/workflow-runs/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -121,6 +157,8 @@ export interface RootRouteChildren {
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   DeferredRoute: typeof DeferredRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
+  ApiWorkflowRunsRoute: typeof ApiWorkflowRunsRouteWithChildren
+  ApiDbHealthRoute: typeof ApiDbHealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/workflow-runs': {
+      id: '/api/workflow-runs'
+      path: '/api/workflow-runs'
+      fullPath: '/api/workflow-runs'
+      preLoaderRoute: typeof ApiWorkflowRunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/users': {
       id: '/api/users'
       path: '/api/users'
@@ -160,12 +205,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PathlessLayoutNestedLayoutRouteImport
       parentRoute: typeof PathlessLayoutRoute
     }
+    '/api/workflow-runs/$id': {
+      id: '/api/workflow-runs/$id'
+      path: '/$id'
+      fullPath: '/api/workflow-runs/$id'
+      preLoaderRoute: typeof ApiWorkflowRunsIdRouteImport
+      parentRoute: typeof ApiWorkflowRunsRoute
+    }
     '/api/users/$id': {
       id: '/api/users/$id'
       path: '/$id'
       fullPath: '/api/users/$id'
       preLoaderRoute: typeof ApiUsersIdRouteImport
       parentRoute: typeof ApiUsersRoute
+    }
+    '/api/db/health': {
+      id: '/api/db/health'
+      path: '/api/db/health'
+      fullPath: '/api/db/health'
+      preLoaderRoute: typeof ApiDbHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_pathlessLayout/_nested-layout/route-b': {
       id: '/_pathlessLayout/_nested-layout/route-b'
@@ -226,11 +285,25 @@ const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
   ApiUsersRouteChildren,
 )
 
+interface ApiWorkflowRunsRouteChildren {
+  ApiWorkflowRunsIdRoute: typeof ApiWorkflowRunsIdRoute
+}
+
+const ApiWorkflowRunsRouteChildren: ApiWorkflowRunsRouteChildren = {
+  ApiWorkflowRunsIdRoute: ApiWorkflowRunsIdRoute,
+}
+
+const ApiWorkflowRunsRouteWithChildren = ApiWorkflowRunsRoute._addFileChildren(
+  ApiWorkflowRunsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   DeferredRoute: DeferredRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
+  ApiWorkflowRunsRoute: ApiWorkflowRunsRouteWithChildren,
+  ApiDbHealthRoute: ApiDbHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
