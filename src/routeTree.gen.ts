@@ -14,6 +14,7 @@ import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiWorkflowRunsRouteImport } from './routes/api/workflow-runs'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
+import { Route as ApiPlaygroundRunsRouteImport } from './routes/api/playground-runs'
 import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathlessLayout/_nested-layout'
 import { Route as ApiWorkflowRunsIdRouteImport } from './routes/api/workflow-runs.$id'
 import { Route as ApiUsersIdRouteImport } from './routes/api/users.$id'
@@ -43,6 +44,11 @@ const ApiWorkflowRunsRoute = ApiWorkflowRunsRouteImport.update({
 const ApiUsersRoute = ApiUsersRouteImport.update({
   id: '/api/users',
   path: '/api/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPlaygroundRunsRoute = ApiPlaygroundRunsRouteImport.update({
+  id: '/api/playground-runs',
+  path: '/api/playground-runs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PathlessLayoutNestedLayoutRoute =
@@ -81,6 +87,7 @@ const PathlessLayoutNestedLayoutRouteARoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deferred': typeof DeferredRoute
+  '/api/playground-runs': typeof ApiPlaygroundRunsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deferred': typeof DeferredRoute
+  '/api/playground-runs': typeof ApiPlaygroundRunsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_pathlessLayout': typeof PathlessLayoutRouteWithChildren
   '/deferred': typeof DeferredRoute
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
+  '/api/playground-runs': typeof ApiPlaygroundRunsRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/api/workflow-runs': typeof ApiWorkflowRunsRouteWithChildren
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/deferred'
+    | '/api/playground-runs'
     | '/api/users'
     | '/api/workflow-runs'
     | '/route-a'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/deferred'
+    | '/api/playground-runs'
     | '/api/users'
     | '/api/workflow-runs'
     | '/route-a'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/_pathlessLayout'
     | '/deferred'
     | '/_pathlessLayout/_nested-layout'
+    | '/api/playground-runs'
     | '/api/users'
     | '/api/workflow-runs'
     | '/_pathlessLayout/_nested-layout/route-a'
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PathlessLayoutRoute: typeof PathlessLayoutRouteWithChildren
   DeferredRoute: typeof DeferredRoute
+  ApiPlaygroundRunsRoute: typeof ApiPlaygroundRunsRoute
   ApiUsersRoute: typeof ApiUsersRouteWithChildren
   ApiWorkflowRunsRoute: typeof ApiWorkflowRunsRouteWithChildren
   ApiDbHealthRoute: typeof ApiDbHealthRoute
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/api/users'
       fullPath: '/api/users'
       preLoaderRoute: typeof ApiUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/playground-runs': {
+      id: '/api/playground-runs'
+      path: '/api/playground-runs'
+      fullPath: '/api/playground-runs'
+      preLoaderRoute: typeof ApiPlaygroundRunsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_pathlessLayout/_nested-layout': {
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PathlessLayoutRoute: PathlessLayoutRouteWithChildren,
   DeferredRoute: DeferredRoute,
+  ApiPlaygroundRunsRoute: ApiPlaygroundRunsRoute,
   ApiUsersRoute: ApiUsersRouteWithChildren,
   ApiWorkflowRunsRoute: ApiWorkflowRunsRouteWithChildren,
   ApiDbHealthRoute: ApiDbHealthRoute,

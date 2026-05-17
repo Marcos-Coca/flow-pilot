@@ -1,6 +1,3 @@
-import { Globe, Sparkles, Zap } from "lucide-react";
-import type { Node } from "@xyflow/react";
-
 import {
   Sheet,
   SheetContent,
@@ -8,29 +5,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "~/components/ui/sheet";
+import { Globe, MousePointerClick, Sparkles } from "lucide-react";
 
-import type { WorkflowNodeData } from "./types";
-
-const iconMap = {
-  trigger: Zap,
-  action: Globe,
-  ai: Sparkles,
-} as const;
-
-const colorMap = {
-  trigger: "text-node-trigger bg-node-trigger/15",
-  action: "text-node-action bg-node-action/15",
-  ai: "text-node-ai bg-node-ai/15",
-} as const;
-
-const borderMap = {
-  trigger: "border-node-trigger/30",
-  action: "border-node-action/30",
-  ai: "border-node-ai/30",
-} as const;
+import type { WorkflowNode } from "./types";
 
 interface InspectorPanelProps {
-  node: Node<WorkflowNodeData> | null;
+  node: WorkflowNode | null;
   onClose: () => void;
 }
 
@@ -38,7 +18,9 @@ export function InspectorPanel({ node, onClose }: InspectorPanelProps) {
   if (!node) return null;
 
   const data = node.data;
-  const Icon = iconMap[data.type];
+  const Icon = getInspectorIcon(node.type);
+  const iconClassName = getInspectorIconClassName(node.type);
+  const detailsBorderClassName = getInspectorBorderClassName(node.type);
 
   return (
     <Sheet
@@ -55,7 +37,7 @@ export function InspectorPanel({ node, onClose }: InspectorPanelProps) {
         <SheetHeader className="border-b border-border pr-12">
           <div className="flex items-center gap-2.5">
             <div
-              className={`flex size-7 items-center justify-center rounded-md ${colorMap[data.type]}`}
+              className={`flex size-7 items-center justify-center rounded-md ${iconClassName}`}
             >
               <Icon className="size-3.5" />
             </div>
@@ -73,13 +55,13 @@ export function InspectorPanel({ node, onClose }: InspectorPanelProps) {
                 Details
               </div>
               <div
-                className={`rounded-lg border p-3 ${borderMap[data.type]} bg-background`}
+                className={`rounded-lg border bg-background p-3 ${detailsBorderClassName}`}
               >
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Type</span>
                     <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[11px]">
-                      {data.type}
+                      {node.type}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -138,4 +120,37 @@ export function InspectorPanel({ node, onClose }: InspectorPanelProps) {
       </SheetContent>
     </Sheet>
   );
+}
+
+function getInspectorIcon(type: WorkflowNode["type"]) {
+  switch (type) {
+    case "trigger.manual":
+      return MousePointerClick;
+    case "action.http_request":
+      return Globe;
+    case "action.ai_extract":
+      return Sparkles;
+  }
+}
+
+function getInspectorIconClassName(type: WorkflowNode["type"]) {
+  switch (type) {
+    case "trigger.manual":
+      return "bg-node-trigger/15 text-node-trigger";
+    case "action.http_request":
+      return "bg-node-action/15 text-node-action";
+    case "action.ai_extract":
+      return "bg-node-ai/15 text-node-ai";
+  }
+}
+
+function getInspectorBorderClassName(type: WorkflowNode["type"]) {
+  switch (type) {
+    case "trigger.manual":
+      return "border-node-trigger/30";
+    case "action.http_request":
+      return "border-node-action/30";
+    case "action.ai_extract":
+      return "border-node-ai/30";
+  }
 }

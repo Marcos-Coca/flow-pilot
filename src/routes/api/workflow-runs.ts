@@ -3,11 +3,9 @@ import { env } from 'cloudflare:workers'
 import { createFileRoute } from '@tanstack/react-router'
 import { getDb } from '~/db/client'
 import { type JsonValue, workflowRuns, workflows } from '~/db/schema'
-import { buildLinearExecutionPlan } from '~/workflows/execution-plan'
-import { createPendingSteps } from '~/workflows/run-state'
+import { startWorkflowRun } from '~/workflows/start-run'
 import type {
   WorkflowBindings,
-  WorkflowExecutionPayload,
 } from '~/workflows/types'
 
 interface StartWorkflowRunRequest {
@@ -56,56 +54,16 @@ export const Route = createFileRoute('/api/workflow-runs')({
           )
         }
 
-        const executionPlan = buildLinearExecutionPlan(
-          workflowVersion.definition,
-          body.triggerNodeId,
-        )
-
-        const runId = crypto.randomUUID()
-
-        await db.insert(workflowRuns).values({
-          id: runId,
-          userId: workflow.userId,
-          workflowId: workflow.id,
-          workflowVersionId: workflowVersion.id,
-          triggerNodeId: body.triggerNodeId,
-          status: 'queued',
-          input: body.input ?? null,
-          createdAt: Date.now(),
-        })
-
-        await createPendingSteps(db, runId, executionPlan)
-
-        const payload: WorkflowExecutionPayload = {
-          runId,
+        const run = await startWorkflowRun(db, workflowExecutor, {
           userId: workflow.userId,
           workflowId: workflow.id,
           workflowVersionId: workflowVersion.id,
           triggerNodeId: body.triggerNodeId,
           definition: workflowVersion.definition,
           input: body.input ?? null,
-        }
-
-        const instance = await workflowExecutor.create({
-          id: runId,
-          params: payload,
         })
 
-        await db
-          .update(workflowRuns)
-          .set({
-            cloudflareWorkflowInstanceId: instance.id,
-          })
-          .where(eq(workflowRuns.id, runId))
-
-        return Response.json({
-          runId,
-          workflowId: workflow.id,
-          workflowVersionId: workflowVersion.id,
-          instanceId: instance.id,
-          status: await instance.status(),
-          stepCount: executionPlan.length,
-        })
+        return Response.json(run)
       },
     },
   },
