@@ -10,8 +10,6 @@ export interface WorkflowNodeData extends Record<string, unknown> {
   subtitle: string;
   config?: Record<string, string>;
   isEditorMode: boolean;
-  isExecutingTrigger?: boolean;
-  onExecuteTrigger?: () => void;
 }
 
 export type WorkflowNode = Node<WorkflowNodeData, WorkflowNodeType>;

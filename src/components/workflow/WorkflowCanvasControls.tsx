@@ -1,9 +1,7 @@
 import { useState } from "react";
 import {
   Globe,
-  Loader2,
   MousePointerClick,
-  Play,
   Plus,
   Search,
   Sparkles,
@@ -32,18 +30,14 @@ export interface NodeTemplate {
 
 interface WorkflowCanvasControlsProps {
   canvasMode: CanvasMode;
-  isExecutingPlaygroundRun: boolean;
   onAddNode: (template: NodeTemplate) => void;
-  onExecutePlayground: () => void;
   onSetCanvasMode: (mode: CanvasMode) => void;
   templates: NodeTemplate[];
 }
 
 export function WorkflowCanvasControls({
   canvasMode,
-  isExecutingPlaygroundRun,
   onAddNode,
-  onExecutePlayground,
   onSetCanvasMode,
   templates,
 }: WorkflowCanvasControlsProps) {
@@ -125,23 +119,7 @@ export function WorkflowCanvasControls({
                 Open Playground
               </Button>
             </>
-          ) : (
-            <>
-              <div className="h-8 w-px bg-border" />
-              <Button
-                onClick={onExecutePlayground}
-                size="sm"
-                disabled={isExecutingPlaygroundRun}
-              >
-                {isExecutingPlaygroundRun ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Play className="size-3.5" />
-                )}
-                {isExecutingPlaygroundRun ? "Running..." : "Run Again"}
-              </Button>
-            </>
-          )}
+          ) : null}
         </div>
       </div>
       <SheetContent
